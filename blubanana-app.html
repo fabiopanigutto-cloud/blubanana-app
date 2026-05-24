@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Blubanana">
+<title>Blubanana Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root {
+  --blu:#1B3A6B;--blu-m:#2A5298;--blu-l:#D6E4FF;--blu-xl:#EEF4FF;
+  --banana:#F5C400;--banana-d:#B38B00;--banana-l:#FFF8D6;
+  --bg:#F7F8FC;--card:#FFFFFF;--border:rgba(27,58,107,0.12);--border-m:rgba(27,58,107,0.22);
+  --txt:#0F1E3C;--txt2:#4A5878;--txt3:#8A9BB8;
+  --fabio:#1B3A6B;--fabio-l:#D6E4FF;--fabio-d:#0F1E3C;
+  --anna:#D4860A;--anna-l:#FFF0D6;--anna-d:#7A4A00;
+  --green:#1A7A4A;--green-l:#D6F5E6;--red:#C0392B;--red-l:#FDECEA;
+  --radius:14px;--radius-sm:8px;--shadow:0 2px 12px rgba(27,58,107,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--txt)}
+.app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+.topbar{background:var(--blu);padding:52px 18px 14px;display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-logo{width:32px;height:32px;border-radius:8px;background:var(--banana);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;color:var(--blu);font-weight:700}
+.topbar-name{font-family:'Playfair Display',serif;font-size:20px;color:#fff;letter-spacing:-0.3px}
+.topbar-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px}
+.av-row{display:flex;gap:6px}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;border:2px solid rgba(255,255,255,0.3)}
+.av-f{background:var(--fabio-l);color:var(--fabio)}
+.av-a{background:var(--anna-l);color:var(--anna-d)}
+.scroll{flex:1;overflow-y:auto;padding:14px 14px 82px;-webkit-overflow-scrolling:touch}
+.page{display:none}.page.active{display:block}
+
+/* LOADING */
+.loading-overlay{position:absolute;inset:0;background:var(--blu);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.loading-logo{font-family:'Playfair Display',serif;font-size:32px;color:#fff}
+.loading-logo span{color:var(--banana)}
+.loading-spin{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:var(--banana);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:13px;color:rgba(255,255,255,0.6)}
+
+/* TOAST */
+.toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:var(--txt);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}
+
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.sc{background:var(--card);border-radius:var(--radius);padding:13px;border:0.5px solid var(--border);box-shadow:var(--shadow)}
+.sc-icon{font-size:18px;margin-bottom:6px}
+.sc-lbl{font-size:11px;color:var(--txt3);margin-bottom:2px}
+.sc-val{font-size:20px;font-weight:600;color:var(--txt)}
+.sc-sub{font-size:10px;color:var(--txt3);margin-top:2px}
+.sc-fabio{border-top:3px solid var(--fabio)}.sc-anna{border-top:3px solid var(--anna)}
+.shd{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px}
+.slbl{font-size:13px;font-weight:600;color:var(--txt);letter-spacing:0.1px}
+.btn-xs{background:var(--blu-xl);border:0.5px solid var(--blu-l);border-radius:20px;padding:4px 11px;font-size:12px;cursor:pointer;color:var(--blu);font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.btn-xs:active{transform:scale(0.96)}
+.card{background:var(--card);border-radius:var(--radius);padding:13px 15px;border:0.5px solid var(--border);box-shadow:var(--shadow);margin-bottom:10px}
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap;display:inline-block}
+.b-fabio{background:var(--fabio-l);color:var(--fabio)}.b-anna{background:var(--anna-l);color:var(--anna-d)}
+.b-green{background:var(--green-l);color:var(--green)}.b-amber{background:#FFF0D6;color:#7A4A00}
+.b-gray{background:#EEF0F5;color:#4A5878}.b-red{background:var(--red-l);color:var(--red)}
+.b-banana{background:var(--banana-l);color:var(--banana-d)}
+.ri{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.ri:last-child{border-bottom:none;padding-bottom:0}.ri:first-child{padding-top:0}
+.rm{flex:1;min-width:0}
+.rt{font-size:13px;font-weight:500;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs{font-size:11px;color:var(--txt3);margin-top:2px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.dot-todo{background:#B4BAC8}.dot-wip{background:#F0A500}.dot-done{background:var(--green)}
+.lbw{margin-bottom:14px}.lbw:last-child{margin-bottom:0}
+.lbh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.lbn{font-size:13px;font-weight:500;color:var(--txt)}.lbv{font-size:11px;color:var(--txt3)}
+.lbt{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:0.5px solid var(--border)}
+.lbf{height:8px;border-radius:4px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.partner-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.pc{background:var(--card);border-radius:var(--radius);padding:13px;border:0.5px solid var(--border);box-shadow:var(--shadow)}
+.pc-fat{font-size:20px;font-weight:600;color:var(--txt);margin:4px 0}
+.pc-net{font-size:11px;color:var(--txt3)}.pc-net span{font-weight:600;color:var(--txt)}
+.pc-det{font-size:10px;color:var(--txt3);margin-top:3px;line-height:1.5}
+.btr{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:10px;border:0.5px solid var(--border)}
+.btf{height:5px;border-radius:3px;transition:width .4s}
+.rebox{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px}
+.rebox-ok{background:var(--green-l);border:0.5px solid #8ADCB8}
+.rebox-ok p{font-size:13px;color:var(--green)}
+.rebox-w{background:var(--blu-xl);border:0.5px solid var(--blu-l)}
+.rebox-w p{font-size:12px;color:var(--blu-m)}
+.rebox-w strong{font-size:15px;display:block;margin-top:3px;color:var(--blu);font-weight:600}
+.note-box{background:var(--blu-xl);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--txt2);line-height:1.6;margin-top:12px;border:0.5px solid var(--blu-l)}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;-ms-overflow-style:none;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:var(--card);border:0.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--txt3);white-space:nowrap}
+.tab.on{background:var(--blu);border-color:var(--blu);color:#fff}
+.tab.on-a{background:var(--anna);border-color:var(--anna);color:#fff}
+.month-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.month-row:last-child{border-bottom:none}
+.month-name{font-size:12px;font-weight:600;color:var(--txt);min-width:72px}
+.month-chips{flex:1;display:flex;gap:6px}
+.mc{flex:1;border-radius:var(--radius-sm);padding:5px 8px;font-size:11px;text-align:center}
+.mc-f{background:var(--blu-xl);border:0.5px solid var(--blu-l)}
+.mc-a{background:var(--anna-l);border:0.5px solid #F5C07A}
+.mc-lbl{font-size:9px;color:var(--txt3);font-weight:500}
+.mc-val{font-weight:600;font-size:12px;color:var(--txt);margin-top:1px}
+.edit-btn{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px;font-size:16px}
+.info-box{background:var(--banana-l);border:0.5px solid #E8C340;border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--banana-d);line-height:1.6;margin-bottom:12px}
+.fab{position:absolute;bottom:74px;right:14px;width:50px;height:50px;border-radius:50%;background:var(--banana);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(245,196,0,0.4);z-index:10;transition:transform .15s}
+.fab i{font-size:24px;color:var(--blu)}.fab:active{transform:scale(0.93)}
+.bottomnav{background:var(--card);border-top:0.5px solid var(--border);display:flex;padding:6px 0 18px;flex-shrink:0;box-shadow:0 -4px 20px rgba(27,58,107,0.06)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0}
+.bn i{font-size:22px;color:var(--txt3)}.bn span{font-size:10px;color:var(--txt3);font-weight:500}
+.bn.active i,.bn.active span{color:var(--blu)}
+.modal-wrap{display:none;position:absolute;inset:0;background:rgba(15,30,60,0.5);z-index:50;align-items:flex-end}
+.modal-wrap.open{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px 32px;width:100%;max-height:90%;overflow-y:auto;animation:slideUp .25s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:var(--border-m);border-radius:2px;margin:0 auto 16px}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:16px;color:var(--txt)}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--txt2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-m);background:var(--bg);font-size:14px;font-family:'DM Sans',sans-serif;color:var(--txt);outline:none;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{border-color:var(--blu);background:#fff}
+.fg textarea{height:60px;resize:none}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mbtns{display:flex;gap:10px;margin-top:16px}
+.mbtns button{flex:1;padding:13px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border-m);background:transparent;color:var(--txt);font-family:'DM Sans',sans-serif}
+.mbtns .ok{background:var(--blu);border-color:var(--blu);color:#fff}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.act-btn{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.act-btn:active{transform:scale(0.96)}
+.act-btn i{font-size:24px;color:var(--blu)}
+.act-btn span{font-size:12px;font-weight:500;color:var(--txt)}
+.act-btn small{font-size:10px;color:var(--txt3)}
+.spesa-card{background:var(--card);border-radius:var(--radius);padding:12px 14px;border:0.5px solid var(--border);margin-bottom:8px;box-shadow:var(--shadow)}
+.spesa-head{display:flex;align-items:flex-start;gap:10px}
+.spesa-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.si-fatt{background:var(--blu-xl);color:var(--blu)}.si-nonfatt{background:var(--banana-l);color:var(--banana-d)}
+.spesa-info{flex:1;min-width:0}
+.spesa-nome{font-size:13px;font-weight:500;color:var(--txt)}
+.spesa-meta{font-size:11px;color:var(--txt3);margin-top:2px}
+.spesa-importo{font-size:14px;font-weight:600;color:var(--txt)}
+.spesa-quota{font-size:10px;color:var(--txt3)}
+.spesa-footer{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.bil-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.bil-row:last-child{border-bottom:none}
+.bil-lbl{color:var(--txt2)}.bil-val{font-weight:600;color:var(--txt)}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px;font-size:15px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">B</div>
+      <div>
+        <div class="topbar-name">blubanana</div>
+        <div class="topbar-sub" id="tsub">caricamento...</div>
+      </div>
+    </div>
+    <div class="av-row"><div class="av av-f">FA</div><div class="av av-a">AN</div></div>
+  </div>
+
+  <div class="scroll">
+    <div id="pg-home" class="page active">
+      <div class="sg" style="margin-top:4px">
+        <div class="sc sc-fabio"><div class="sc-icon" style="color:var(--blu)"><i class="ti ti-user" aria-hidden="true"></i></div><div class="sc-lbl">Fatturato Fabio</div><div class="sc-val" id="h-ff">—</div><div class="sc-sub">imponibile YTD</div></div>
+        <div class="sc sc-anna"><div class="sc-icon" style="color:var(--anna)"><i class="ti ti-user" aria-hidden="true"></i></div><div class="sc-lbl">Fatturato Anna</div><div class="sc-val" id="h-fa">—</div><div class="sc-sub">imponibile YTD</div></div>
+        <div class="sc sc-fabio"><div class="sc-icon" style="color:var(--blu)"><i class="ti ti-wallet" aria-hidden="true"></i></div><div class="sc-lbl">Netto Fabio</div><div class="sc-val" id="h-nf">—</div><div class="sc-sub">dopo flat tax</div></div>
+        <div class="sc sc-anna"><div class="sc-icon" style="color:var(--anna)"><i class="ti ti-wallet" aria-hidden="true"></i></div><div class="sc-lbl">Netto Anna</div><div class="sc-val" id="h-na">—</div><div class="sc-sub">dopo IRPEF+INPS</div></div>
+      </div>
+      <div class="shd"><span class="slbl"><i class="ti ti-chart-bar" style="font-size:14px;vertical-align:-2px;margin-right:5px" aria-hidden="true"></i>Carico ore</span></div>
+      <div class="card" id="h-load"><div style="font-size:13px;color:var(--txt3)">Caricamento...</div></div>
+      <div class="shd"><span class="slbl"><i class="ti ti-calendar" style="font-size:14px;vertical-align:-2px;margin-right:5px" aria-hidden="true"></i>Prossimi lavori</span></div>
+      <div class="card" id="h-jobs"><div style="font-size:13px;color:var(--txt3)">Caricamento...</div></div>
+      <div class="shd"><span class="slbl"><i class="ti ti-scale" style="font-size:14px;vertical-align:-2px;margin-right:5px" aria-hidden="true"></i>Bilancio rapido</span></div>
+      <div id="h-bil"></div>
+    </div>
+
+    <div id="pg-fatturato" class="page">
+      <div class="info-box" style="margin-top:4px">
+        <strong style="display:block;margin-bottom:3px">Inserire sempre l'imponibile senza IVA</strong>
+        Fabio: forfettario (flat tax 15%) · Anna: ordinario (IRPEF 35% + INPS 26%)<br>
+        L'IVA di Anna viene riversata allo Stato — non conta nel bilancio tra soci.
+      </div>
+      <div class="shd"><span class="slbl">Riepilogo mensile</span><button class="btn-xs" onclick="openModal('mese')"><i class="ti ti-plus" aria-hidden="true"></i> Mese</button></div>
+      <div class="card"><div id="mesi-list"><div style="font-size:13px;color:var(--txt3)">Caricamento...</div></div></div>
+    </div>
+
+    <div id="pg-studio" class="page">
+      <div class="tabs" style="margin-top:4px">
+        <div class="tab on" id="tf-all" onclick="filterS('all')">Tutti</div>
+        <div class="tab" id="tf-fabio" onclick="filterS('fabio')">Fabio</div>
+        <div class="tab" id="tf-anna" onclick="filterS('anna')">Anna</div>
+      </div>
+      <div class="shd"><span class="slbl">Carico ore</span></div>
+      <div class="card" id="s-load"></div>
+      <div class="shd"><span class="slbl">Lavori</span></div>
+      <div id="s-jobs"></div>
+    </div>
+
+    <div id="pg-spese" class="page">
+      <div class="tabs" style="margin-top:4px">
+        <div class="tab on" id="sp-tab-tutte" onclick="filterSp('tutte')">Tutte</div>
+        <div class="tab" id="sp-tab-fatturate" onclick="filterSp('fatturate')">Fatturate</div>
+        <div class="tab" id="sp-tab-nonfatt" onclick="filterSp('nonfatt')">Non fatturate</div>
+      </div>
+      <div class="info-box">
+        <strong>Fatturate</strong> = acquisti con fattura (deducibili) — Anna le gestisce per vantaggio fiscale.<br>
+        <strong>Non fatturate</strong> = contanti, abbonamenti, trasferte senza ricevuta.
+      </div>
+      <div class="shd"><span class="slbl">Spese studio</span></div>
+      <div id="spese-list"></div>
+      <div class="shd"><span class="slbl">Riepilogo bilancio spese</span></div>
+      <div class="card" id="sp-bilancio"></div>
+    </div>
+  </div>
+
+  <button class="fab" onclick="openFab()" aria-label="Aggiungi"><i class="ti ti-plus" aria-hidden="true"></i></button>
+
+  <nav class="bottomnav">
+    <div class="bn active" id="bn-home" onclick="goPage('home')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i><span>Home</span></div>
+    <div class="bn" id="bn-fatturato" onclick="goPage('fatturato')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span>Fatturato</span></div>
+    <div class="bn" id="bn-studio" onclick="goPage('studio')"><i class="ti ti-checklist" aria-hidden="true"></i><span>Studio</span></div>
+    <div class="bn" id="bn-spese" onclick="goPage('spese')"><i class="ti ti-receipt" aria-hidden="true"></i><span>Spese</span></div>
+  </nav>
+
+  <div class="loading-overlay" id="loading">
+    <div class="loading-logo">blu<span>banana</span></div>
+    <div class="loading-spin"></div>
+    <div class="loading-msg">Connessione al database...</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-wrap" id="modal">
+    <div class="modal"><div class="mhandle"></div><div id="modal-body"></div></div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://izldkcdqaieioonmbyhx.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6bGRrY2RxYWllaW9vbm1ieWh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzA1MTQsImV4cCI6MjA5NTIwNjUxNH0.wvwazlI8saPcz8lh6fGOzr_B3MZiOq859vZGOVPdBo0';
+const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const FMT = n => '€' + Math.round(n).toLocaleString('it-IT');
+
+let mensili=[], lavori=[], spese=[];
+let sFilter='all', spFilter='tutte', curPage='home';
+
+// --- SUPABASE API ---
+async function db(table, method='GET', body=null, id=null){
+  const url = `${SUPA_URL}/rest/v1/${table}${id?`?id=eq.${id}`:''}`;
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': method==='POST'?'return=representation':'',
+  };
+  if(method==='GET') headers['Accept']='application/json';
+  const res = await fetch(url, {method, headers, body: body?JSON.stringify(body):null});
+  if(method==='DELETE'||method==='PATCH') return true;
+  return res.json();
+}
+
+async function dbAll(table){ return db(table); }
+async function dbInsert(table, row){ return db(table,'POST',row); }
+async function dbUpdate(table, id, row){ return db(table,'PATCH',row,id); }
+async function dbDelete(table, id){ return db(table,'DELETE',null,id); }
+
+// --- TOAST ---
+function toast(msg, dur=2200){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// --- CALCOLI ---
+function nettoF(f){const i=f*0.78,t=i*0.15;return{imp:i,tax:t,net:f-t}}
+function nettoA(f){const inps=f*0.26,irpef=(f-inps*0.5)*0.35;return{inps,irpef,net:f-inps-irpef}}
+function totF(){return mensili.reduce((s,m)=>s+(m.f||0),0)}
+function totA(){return mensili.reduce((s,m)=>s+(m.a||0),0)}
+function calcolaBilSpese(){
+  let cF=0,cA=0;
+  spese.forEach(s=>{
+    if(!s.split)return;
+    const q=s.importo/2;
+    if(s.pagante==='fabio')cF+=q;
+    if(s.pagante==='anna')cA+=q;
+  });
+  return{cF,cA,diff:cA-cF};
+}
+
+// --- NAVIGATION ---
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bn-'+id).classList.add('active');
+  const t={home:'studio · mestre',fatturato:'fatturato mensile',studio:'gestione studio',spese:'spese & bilancio'};
+  document.getElementById('tsub').textContent=t[id];
+  curPage=id;
+  ({home:renderHome,fatturato:renderFatturato,studio:renderStudio,spese:renderSpese})[id]();
+}
+
+// --- RENDER LOAD ---
+function renderLoad(el,filter){
+  const soci=['fabio','anna'];
+  el.innerHTML=soci.filter(s=>filter==='all'||filter===s).map(s=>{
+    const miei=lavori.filter(l=>(l.socio===s||l.socio==='entrambi')&&l.stato!=='done');
+    const ore=Math.round(miei.reduce((a,l)=>a+(l.socio==='entrambi'?l.ore/2:l.ore),0));
+    const pct=Math.min(Math.round(ore/40*100),100);
+    const col=s==='fabio'?'var(--fabio)':'var(--anna)';
+    return`<div class="lbw"><div class="lbh"><span class="lbn">${s==='fabio'?'Fabio':'Anna'}</span><span class="lbv">${ore}h attive · ${miei.length} lavori</span></div><div class="lbt"><div class="lbf" style="background:${col};width:${pct}%"></div></div></div>`;
+  }).join('');
+}
+
+function renderBilRapido(el){
+  const ff=totF(),fa=totA(),F=nettoF(ff),A=nettoA(fa),diff=Math.abs(F.net-A.net);
+  if(diff<10){el.innerHTML='<div class="rebox rebox-ok"><p><i class="ti ti-check" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Netti bilanciati — ottimo!</p></div>';return;}
+  const chi=F.net>A.net?'Anna':'Fabio';
+  el.innerHTML=`<div class="rebox rebox-w"><p>${chi} ha un netto inferiore di:</p><strong>${FMT(diff)}</strong><p style="margin-top:5px;font-size:11px">Rivedere distribuzione fatturato col commercialista.</p></div>`;
+}
+
+function renderHome(){
+  const ff=totF(),fa=totA(),F=nettoF(ff),A=nettoA(fa);
+  document.getElementById('h-ff').textContent=FMT(ff);
+  document.getElementById('h-fa').textContent=FMT(fa);
+  document.getElementById('h-nf').textContent=FMT(F.net);
+  document.getElementById('h-na').textContent=FMT(A.net);
+  renderLoad(document.getElementById('h-load'),'all');
+  const ap=lavori.filter(l=>l.stato!=='done').slice(0,3);
+  const jel=document.getElementById('h-jobs');
+  jel.innerHTML=ap.length?ap.map(l=>`<div class="ri"><div class="dot ${l.stato==='wip'?'dot-wip':'dot-todo'}"></div><div class="rm"><div class="rt">${l.titolo}</div><div class="rs">${l.data||'—'} · ${l.socio==='entrambi'?'Entrambi':l.socio==='fabio'?'Fabio':'Anna'} · <i class="ti ti-clock" style="font-size:11px" aria-hidden="true"></i> ${l.ore}h</div></div></div>`).join(''):'<p style="font-size:13px;color:var(--txt3)">Nessun lavoro aperto</p>';
+  renderBilRapido(document.getElementById('h-bil'));
+}
+
+function renderFatturato(){
+  const el=document.getElementById('mesi-list');
+  el.innerHTML=mensili.length?mensili.map(m=>`
+    <div class="month-row">
+      <div class="month-name">${MESI[m.m]}</div>
+      <div class="month-chips">
+        <div class="mc mc-f"><div class="mc-lbl">Fabio</div><div class="mc-val">${FMT(m.f||0)}</div></div>
+        <div class="mc mc-a"><div class="mc-lbl">Anna</div><div class="mc-val">${FMT(m.a||0)}</div></div>
+      </div>
+      <button class="edit-btn" onclick="openModal('mese','${m.id}')" aria-label="Modifica"><i class="ti ti-edit" aria-hidden="true"></i></button>
+    </div>`).join(''):'<p style="font-size:13px;color:var(--txt3)">Nessun dato ancora — aggiungi il primo mese!</p>';
+}
+
+function filterS(f){
+  sFilter=f;
+  document.querySelectorAll('[id^="tf-"]').forEach(t=>t.classList.remove('on','on-a'));
+  document.getElementById('tf-'+f).classList.add(f==='anna'?'on-a':'on');
+  renderStudio();
+}
+
+function renderStudio(){
+  renderLoad(document.getElementById('s-load'),sFilter);
+  const list=lavori.filter(l=>sFilter==='all'||(l.socio===sFilter||l.socio==='entrambi'));
+  const stati={todo:'Da fare',wip:'In corso',done:'Completato'};
+  document.getElementById('s-jobs').innerHTML=list.length?list.map(l=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div class="dot ${l.stato==='todo'?'dot-todo':l.stato==='wip'?'dot-wip':'dot-done'}" style="margin-top:5px;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:5px">${l.titolo}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px">
+            <span class="badge ${l.socio==='fabio'?'b-fabio':l.socio==='anna'?'b-anna':'b-gray'}">${l.socio==='entrambi'?'Entrambi':l.socio==='fabio'?'Fabio':'Anna'}</span>
+            <span class="badge ${l.stato==='done'?'b-green':l.stato==='wip'?'b-amber':'b-gray'}">${stati[l.stato]}</span>
+            <span class="badge b-banana"><i class="ti ti-clock" style="font-size:10px" aria-hidden="true"></i> ${l.ore}h</span>
+          </div>
+          <div style="font-size:11px;color:var(--txt3)">${l.data||'—'}${l.note?' · '+l.note:''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;font-size:11px;font-weight:500;cursor:pointer;color:var(--txt)" onclick="cycleStato('${l.id}','${l.stato}')">${l.stato==='todo'?'Inizia':l.stato==='wip'?'Chiudi':'↩'}</button>
+          <button class="del-btn" onclick="deleteLavoro('${l.id}')" aria-label="Elimina"><i class="ti ti-trash" aria-hidden="true"></i></button>
+        </div>
+      </div>
+    </div>`).join(''):'<div class="card"><p style="font-size:13px;color:var(--txt3)">Nessun lavoro trovato</p></div>';
+}
+
+function filterSp(f){
+  spFilter=f;
+  document.querySelectorAll('[id^="sp-tab-"]').forEach(t=>t.classList.remove('on','on-a'));
+  document.getElementById('sp-tab-'+f).classList.add('on');
+  renderSpese();
+}
+
+function renderSpese(){
+  const list=spese.filter(s=>spFilter==='tutte'||(spFilter==='fatturate'?s.tipo==='fatturata':s.tipo==='nonfatt'));
+  const el=document.getElementById('spese-list');
+  el.innerHTML=list.length?list.map(s=>{
+    const isFatt=s.tipo==='fatturata';
+    return`<div class="spesa-card">
+      <div class="spesa-head">
+        <div class="spesa-icon ${isFatt?'si-fatt':'si-nonfatt'}"><i class="ti ${isFatt?'ti-file-invoice':'ti-receipt'}" aria-hidden="true"></i></div>
+        <div class="spesa-info">
+          <div class="spesa-nome">${s.descrizione}</div>
+          <div class="spesa-meta">${s.cat} · Pagato da ${s.pagante==='fabio'?'Fabio':'Anna'}${s.note?' · '+s.note:''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="spesa-importo">${FMT(s.importo)}</div>
+          <div class="spesa-quota">${s.split?`Quota: ${FMT(s.importo/2)} cad.`:'Individuale'}</div>
+        </div>
+        <button class="del-btn" onclick="deleteSpesa('${s.id}')" aria-label="Elimina"><i class="ti ti-trash" aria-hidden="true"></i></button>
+      </div>
+      <div class="spesa-footer">
+        <span class="badge ${isFatt?'b-fabio':'b-banana'}">${isFatt?'Fatturata':'Non fatturata'}</span>
+        ${isFatt?'<span class="badge b-anna">Anna (deducibile)</span>':''}
+        ${s.split?'<span class="badge b-gray">Split 50/50</span>':'<span class="badge b-red">Solo '+(s.pagante==='fabio'?'Fabio':'Anna')+'</span>'}
+      </div>
+    </div>`;
+  }).join(''):'<div class="card"><p style="font-size:13px;color:var(--txt3)">Nessuna spesa in questa categoria</p></div>';
+
+  const bil=calcolaBilSpese();
+  const totFatt=spese.filter(s=>s.tipo==='fatturata').reduce((a,s)=>a+s.importo,0);
+  const totNF=spese.filter(s=>s.tipo==='nonfatt').reduce((a,s)=>a+s.importo,0);
+  const totFabio=spese.filter(s=>s.pagante==='fabio').reduce((a,s)=>a+s.importo,0);
+  const totAnna=spese.filter(s=>s.pagante==='anna').reduce((a,s)=>a+s.importo,0);
+  let saldo='';
+  if(Math.abs(bil.diff)<1) saldo='<div class="rebox rebox-ok" style="margin-top:10px"><p>Spese già pareggiate!</p></div>';
+  else if(bil.diff>0) saldo=`<div class="rebox rebox-w" style="margin-top:10px"><p>Fabio deve ad Anna:</p><strong>${FMT(bil.diff)}</strong></div>`;
+  else saldo=`<div class="rebox rebox-w" style="margin-top:10px"><p>Anna deve a Fabio:</p><strong>${FMT(Math.abs(bil.diff))}</strong></div>`;
+  document.getElementById('sp-bilancio').innerHTML=`
+    <div class="bil-row"><span class="bil-lbl">Spese fatturate</span><span class="bil-val">${FMT(totFatt)}</span></div>
+    <div class="bil-row"><span class="bil-lbl">Spese non fatturate</span><span class="bil-val">${FMT(totNF)}</span></div>
+    <div class="bil-row"><span class="bil-lbl">Anticipato da Fabio</span><span class="bil-val">${FMT(totFabio)}</span></div>
+    <div class="bil-row"><span class="bil-lbl">Anticipato da Anna</span><span class="bil-val">${FMT(totAnna)}</span></div>
+    ${saldo}`;
+}
+
+// --- ACTIONS ---
+async function cycleStato(id, statoAttuale){
+  const next={todo:'wip',wip:'done',done:'todo'};
+  const newStato=next[statoAttuale];
+  await dbUpdate('lavori',id,{stato:newStato});
+  const l=lavori.find(x=>x.id===id);
+  if(l) l.stato=newStato;
+  renderStudio();
+  if(curPage==='home') renderHome();
+  toast('Stato aggiornato');
+}
+
+async function deleteLavoro(id){
+  if(!confirm('Eliminare questo lavoro?')) return;
+  await dbDelete('lavori',id);
+  lavori=lavori.filter(l=>l.id!==id);
+  renderStudio();
+  if(curPage==='home') renderHome();
+  toast('Lavoro eliminato');
+}
+
+async function deleteSpesa(id){
+  if(!confirm('Eliminare questa spesa?')) return;
+  await dbDelete('spese',id);
+  spese=spese.filter(s=>s.id!==id);
+  renderSpese();
+  toast('Spesa eliminata');
+}
+
+// --- MODALS ---
+function openFab(){
+  const defaults={home:null,fatturato:'mese',studio:'lavoro',spese:'spesa'};
+  if(defaults[curPage]===null){
+    document.getElementById('modal-body').innerHTML=`<h3>Aggiungi</h3><div class="action-grid">
+      <button class="act-btn" onclick="openModal('mese')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span>Fatturato</span><small>Riepilogo mensile</small></button>
+      <button class="act-btn" onclick="openModal('lavoro')"><i class="ti ti-checklist" aria-hidden="true"></i><span>Lavoro</span><small>Shooting, evento...</small></button>
+      <button class="act-btn" onclick="openModal('spesa')"><i class="ti ti-receipt" aria-hidden="true"></i><span>Spesa</span><small>Fatturata o no</small></button>
+    </div>`;
+    document.getElementById('modal').classList.add('open');
+  } else openModal(defaults[curPage]);
+}
+
+function openModal(type, editId){
+  const forms={
+    mese:()=>{
+      const ex=editId?mensili.find(m=>m.id===editId):null;
+      const opts=MESI.map((n,i)=>`<option value="${i}" ${ex&&ex.m===i?'selected':''} ${!ex&&mensili.find(m=>m.m===i)?'disabled':''}>  ${n}${mensili.find(m=>m.m===i)&&!ex?' ✓':''}</option>`).join('');
+      return`<h3>${ex?'Modifica':'Nuovo'} mese</h3>
+        <div class="fg"><label>Mese</label><select id="mm-m">${opts}</select></div>
+        <div class="fg-row">
+          <div class="fg"><label>Fabio (€)</label><input type="number" id="mm-f" value="${ex?ex.f:''}" placeholder="0"></div>
+          <div class="fg"><label>Anna (€)</label><input type="number" id="mm-a" value="${ex?ex.a:''}" placeholder="0"></div>
+        </div>
+        <div class="note-box" style="margin-bottom:12px">Imponibili senza IVA</div>
+        <div class="mbtns"><button onclick="closeMod()">Annulla</button><button class="ok" onclick="saveMese('${editId||''}')">Salva</button></div>`;
+    },
+    lavoro:()=>`<h3>Nuovo lavoro</h3>
+      <div class="fg"><label>Titolo</label><input type="text" id="ml-t" placeholder="Es. Matrimonio Rossi"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Data</label><input type="date" id="ml-d"></div>
+        <div class="fg"><label>Ore stimate</label><input type="number" id="ml-o" placeholder="4" min="1"></div>
+      </div>
+      <div class="fg"><label>Assegnato a</label><select id="ml-s"><option value="fabio">Fabio</option><option value="anna">Anna</option><option value="entrambi">Entrambi</option></select></div>
+      <div class="fg"><label>Note</label><textarea id="ml-n" placeholder="Dettagli, location..."></textarea></div>
+      <div class="mbtns"><button onclick="closeMod()">Annulla</button><button class="ok" onclick="saveLav()">Salva</button></div>`,
+    spesa:()=>`<h3>Nuova spesa</h3>
+      <div class="fg"><label>Descrizione</label><input type="text" id="ms-d" placeholder="Es. Obiettivo 85mm Sony"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Importo (€)</label><input type="number" id="ms-i" placeholder="0"></div>
+        <div class="fg"><label>Tipo</label><select id="ms-t"><option value="fatturata">Fatturata</option><option value="nonfatt">Non fatturata</option></select></div>
+      </div>
+      <div class="fg"><label>Pagato da</label><select id="ms-p"><option value="anna">Anna (consigliato per fatturate)</option><option value="fabio">Fabio</option></select></div>
+      <div class="fg"><label>Categoria</label><select id="ms-c"><option>Attrezzatura</option><option>Software</option><option>Affitto</option><option>Trasferta</option><option>Rappresentanza</option><option>Marketing</option><option>Altro</option></select></div>
+      <div class="fg"><label>Ripartizione</label><select id="ms-sp"><option value="1">Split 50/50 (condivisa)</option><option value="0">Spesa individuale</option></select></div>
+      <div class="fg"><label>Note</label><input type="text" id="ms-n" placeholder="Facoltativo"></div>
+      <div class="mbtns"><button onclick="closeMod()">Annulla</button><button class="ok" onclick="saveSpesa()">Salva</button></div>`
+  };
+  document.getElementById('modal-body').innerHTML=forms[type]();
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeMod(){document.getElementById('modal').classList.remove('open');}
+
+async function saveMese(editId){
+  const m=parseInt(document.getElementById('mm-m').value);
+  const f=parseFloat(document.getElementById('mm-f').value)||0;
+  const a=parseFloat(document.getElementById('mm-a').value)||0;
+  if(editId){
+    await dbUpdate('mensili',editId,{m,f,a});
+    const idx=mensili.findIndex(x=>x.id===editId);
+    if(idx>=0) mensili[idx]={...mensili[idx],m,f,a};
+    toast('Mese aggiornato');
+  } else {
+    const existing=mensili.find(x=>x.m===m);
+    if(existing){
+      await dbUpdate('mensili',existing.id,{f,a});
+      existing.f=f; existing.a=a;
+      toast('Mese aggiornato');
+    } else {
+      const res=await dbInsert('mensili',{m,f,a});
+      if(res&&res[0]) mensili.push(res[0]);
+      mensili.sort((a,b)=>a.m-b.m);
+      toast('Mese aggiunto');
+    }
+  }
+  closeMod();
+  if(curPage==='fatturato') renderFatturato(); else renderHome();
+}
+
+async function saveLav(){
+  const t=document.getElementById('ml-t')?.value.trim();
+  if(!t) return;
+  const row={titolo:t,data:document.getElementById('ml-d')?.value||null,socio:document.getElementById('ml-s')?.value,stato:'todo',ore:parseInt(document.getElementById('ml-o')?.value)||2,note:document.getElementById('ml-n')?.value||''};
+  const res=await dbInsert('lavori',row);
+  if(res&&res[0]) lavori.push(res[0]);
+  closeMod();
+  if(curPage==='studio') renderStudio(); else renderHome();
+  toast('Lavoro aggiunto');
+}
+
+async function saveSpesa(){
+  const d=document.getElementById('ms-d')?.value.trim();
+  const i=parseFloat(document.getElementById('ms-i')?.value)||0;
+  if(!d||!i) return;
+  const row={descrizione:d,importo:i,tipo:document.getElementById('ms-t')?.value,pagante:document.getElementById('ms-p')?.value,cat:document.getElementById('ms-c')?.value,split:document.getElementById('ms-sp')?.value==='1',note:document.getElementById('ms-n')?.value||''};
+  const res=await dbInsert('spese',row);
+  if(res&&res[0]) spese.push(res[0]);
+  closeMod();
+  if(curPage==='spese') renderSpese();
+  toast('Spesa aggiunta');
+}
+
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeMod();});
+
+// --- INIT ---
+async function init(){
+  try {
+    [mensili, lavori, spese] = await Promise.all([
+      dbAll('mensili'),
+      dbAll('lavori'),
+      dbAll('spese'),
+    ]);
+    mensili.sort((a,b)=>a.m-b.m);
+  } catch(e) {
+    console.error(e);
+  }
+  document.getElementById('loading').style.display='none';
+  document.getElementById('tsub').textContent='studio · mestre';
+  renderHome();
+}
+
+init();
+</script>
+</body>
+</html>
